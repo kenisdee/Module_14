@@ -5,21 +5,16 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from crud_functions import initiate_db, get_all_products
 
-API_TOKEN = ''
+API_TOKEN = '7445718031:AAHCSQhrQMm9Jasj3uY3lKFU8yY08b2C_Hg'
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-# Инициализация базы данных
-initiate_db()
-
-# Класс состояний
 class UserState(StatesGroup):
     age = State()
     growth = State()
     weight = State()
 
-# Клавиатуры
 keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 keyboard.add(KeyboardButton('Рассчитать'))
 keyboard.add(KeyboardButton('Информация'))
@@ -29,7 +24,6 @@ inline_keyboard = InlineKeyboardMarkup()
 inline_keyboard.add(InlineKeyboardButton('Рассчитать норму калорий', callback_data='calories'))
 inline_keyboard.add(InlineKeyboardButton('Формулы расчёта', callback_data='formulas'))
 
-# Обработчики сообщений и коллбэков
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     await message.reply("Привет! Я бот, помогающий твоему здоровью. Чем могу помочь?", reply_markup=keyboard)
@@ -76,6 +70,7 @@ async def send_calories(message: types.Message, state: FSMContext):
     await message.reply(f"Ваша норма калорий: {calories} ккал в день.")
     await state.finish()
 
+
 @dp.message_handler(lambda message: message.text == 'Информация')
 async def send_info(message: types.Message):
     await message.reply("Я бот, помогающий рассчитать вашу дневную норму калорий. Используйте кнопку 'Рассчитать' для начала.")
@@ -85,9 +80,8 @@ async def get_buying_list(message: types.Message):
     products = get_all_products()
     for product in products:
         await message.reply(f"Название: {product[1]} | Описание: {product[2]} | Цена: {product[3]}")
-        if product[4]:  # Проверка наличия пути к изображению
+        if product[4]:
             await message.reply_photo(photo=open(product[4], 'rb'))
-
 
 @dp.callback_query_handler(lambda call: call.data.startswith('product_'))
 async def send_confirm_message(call: types.CallbackQuery):
@@ -95,4 +89,5 @@ async def send_confirm_message(call: types.CallbackQuery):
     await call.message.reply(f"Вы успешно приобрели продукт: Витамин {product_name}!")
 
 if __name__ == '__main__':
+    initiate_db()
     executor.start_polling(dp, skip_updates=True)

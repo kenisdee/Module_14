@@ -1,9 +1,7 @@
 import sqlite3
 
-DATABASE_NAME = 'products.db'
-
 def initiate_db():
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect('products.db')
     cursor = conn.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Products (
@@ -17,7 +15,7 @@ def initiate_db():
     conn.close()
 
 def get_all_products():
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect('products.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Products')
     products = cursor.fetchall()
